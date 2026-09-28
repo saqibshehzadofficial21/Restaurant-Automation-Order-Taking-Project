@@ -1,0 +1,6 @@
+This process is responsible for handling messages related to customer order confirmations.
+It will analyze the received text and determine whether it is intended for sending an order confirmation to the customer.
+
+If the message clearly indicates that it involves confirming an order to the customer, forward it for processing.
+
+If the message does not match this requirement or is unrelated to customer confirmation, ignore it and do not pass it through for classification.

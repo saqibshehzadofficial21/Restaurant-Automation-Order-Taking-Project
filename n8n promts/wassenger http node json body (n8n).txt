@@ -1,0 +1,4 @@
+{
+  "phone": "{{ $('user information').item.json.body.message.toolWithToolCallList[0].toolCall.function.arguments.Contact_number }}",
+  "message": "{{ $json.output ? $json.output.replace(/[\n\r]/g, ' ').replace(/"/g, '\\\"') : '' }}"
+}

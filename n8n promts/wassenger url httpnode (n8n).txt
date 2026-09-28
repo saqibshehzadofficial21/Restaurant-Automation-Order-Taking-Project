@@ -1,0 +1,1 @@
+https://api.wassenger.com/v1/messages?token= replace with your wassenger api

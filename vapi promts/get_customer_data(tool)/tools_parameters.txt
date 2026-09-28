@@ -1,0 +1,19 @@
+Parameters
+Define the parameters your tool accepts.
+
+
+home adress
+*
+string
+contact_number
+*
+string
+what to order
+*
+string
+cutomer_full_name
+*
+string
+special_instruction
+*
+string

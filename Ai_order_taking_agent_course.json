@@ -1,0 +1,1289 @@
+{
+  "name": "2nd_project_course",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "course",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "81a6b047-fbc3-4e66-93cf-d599276286b2",
+      "name": "Webhook",
+      "webhookId": "aad4328a-327a-484c-84f3-4ed27b965532"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=user question :  {{ $json.body.message.toolCallList[0].function.arguments.user_question }}\n\ncustomer Order :\nhome adress : {{ $json.body.message.toolCalls[0].function.arguments['home adress'] }}\ncontact number : {{ $json.body.message.toolCalls[0].function.arguments.contact_number }}\n\nwhat to order : {{ $json.body.message.toolCalls[0].function.arguments['what to order'] }}\ncustomer full name : {{ $json.body.message.toolCalls[0].function.arguments.cutomer_full_name }}\nspecial insteuction : {{ $json.body.message.toolCalls[0].function.arguments.special_instruction }}\n",
+        "options": {
+          "systemMessage": "=You are an AI assistant for a restaurant order system. You have access to a PDF menu through RAG, so if the user asks for information about the menu — like item names, prices, or details — use that PDF to answer accurately. The user has already completed a call with the voice assistant and provided their name, phone number, and the items they want to order. Your job is to: - Understand the user's order - Validate that the items exist in the menu - Summarize the order in a short message - Be polite and concise - Do not ask the user more questions At the end, create a summary message Do not explain how the system works or mention AI. Only focus on returning a natural, useful confirmation."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9e18bdec-dd8a-4f48-8322-ded633f6270d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        208
+      ],
+      "id": "7a41b009-6c9e-4501-81a9-00cb8bb99103",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "MJhgZR8puysekiKj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1m8o72oHVl9sxkH1lUfVbepCibjrPwKGD",
+          "mode": "list",
+          "cachedResultName": "menu_pdf.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1m8o72oHVl9sxkH1lUfVbepCibjrPwKGD/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        656
+      ],
+      "id": "69560953-3bcd-4f77-b31d-4a0e1e173e07",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ITYVRvKMmTWHZ4D9",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        880
+      ],
+      "id": "947bc962-9f11-46d7-90db-d2fae21976bf",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "MJhgZR8puysekiKj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        656
+      ],
+      "id": "d729d792-a484-42a1-9427-1e35e7444cbf",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        864
+      ],
+      "id": "4c0223d2-c11f-4732-a773-67e251a13a10",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1088
+      ],
+      "id": "dc592a5e-5bf3-4cc9-bae9-327bd4d363d9",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "testing-course",
+          "mode": "list",
+          "cachedResultName": "testing-course"
+        },
+        "options": {
+          "pineconeNamespace": "testing_course"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        656
+      ],
+      "id": "450a2956-6850-4260-b1e6-5f5fed96e76d",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "AEuXbiWzKuLU50I5",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieves the most relevant document chunks from Pinecone based on user queries. Ideal for Retrieval-Augmented Generation (RAG) workflows, where AI must respond using real uploaded data such as restaurant menus, FAQs, or documents. This ensures accurate and grounded responses based on your own knowledge base.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "testing-course",
+          "mode": "list",
+          "cachedResultName": "testing-course"
+        },
+        "options": {
+          "pineconeNamespace": "testing_course"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        336
+      ],
+      "id": "a9a21801-522e-4682-96a3-1538610eba3a",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "AEuXbiWzKuLU50I5",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        512
+      ],
+      "id": "f7f6eaf0-6db2-4dcf-a09d-dbcd65bb8dc3",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "MJhgZR8puysekiKj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"results\": [\n    {\n      \"toolCallId\": \"{{ $('Webhook').item.json.body.message.toolCalls[0].id || '' }}\",\n      \"result\": \"{{ $json.output.replace(/\"/g, '\\\\\"').replace(/\\n/g, ' ') || '' }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1184,
+        -432
+      ],
+      "id": "2791dc1c-50ab-4255-980a-9092195ac067",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sendTo": "hassankhaleeq388@gmail.com",
+        "subject": "customer placed an order",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>Order Summary</title>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      background-color: #f7f8fa;\n      margin: 0;\n      padding: 0;\n    }\n    .container {\n      max-width: 500px;\n      margin: 30px auto;\n      background: #ffffff;\n      border-radius: 12px;\n      box-shadow: 0 4px 12px rgba(0,0,0,0.08);\n      overflow: hidden;\n    }\n    .header {\n      background-color: #ff6b35;\n      color: white;\n      text-align: center;\n      padding: 16px 10px;\n      font-size: 1.25rem;\n      font-weight: bold;\n    }\n    .content {\n      padding: 20px;\n      color: #333;\n    }\n    .content p {\n      margin: 8px 0;\n      line-height: 1.5;\n    }\n    .label {\n      font-weight: 600;\n      color: #444;\n    }\n    .footer {\n      text-align: center;\n      padding: 12px;\n      background-color: #f3f3f3;\n      font-size: 0.9rem;\n      color: #777;\n    }\n    @media (max-width: 600px) {\n      .container { margin: 15px; }\n      .header { font-size: 1.1rem; }\n      .content { padding: 15px; }\n    }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">New Order Received</div>\n    <div class=\"content\">\n      <p>Hi <strong>{{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.cutomer_full_name }}</strong>,</p>\n      <p>has placed an order at your restaurant. Here’s the customer summary:</p>\n\n      <p><span class=\"label\">Customer Name:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.cutomer_full_name }}</p>\n      <p><span class=\"label\">Contact Number:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.contact_number }}</p>\n      <p><span class=\"label\">Item(s) Placed:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments['what to order'] }}</p>\n      <p><span class=\"label\">Special Instruction:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.special_instruction }}</p>\n    </div>\n    <div class=\"footer\">\n      Thank you for choosing our restaurant 🍽️\n    </div>\n  </div>\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        352
+      ],
+      "id": "8c89079d-76d9-4f20-8fc5-7ecca34ddad0",
+      "name": "Send a message",
+      "webhookId": "cc1b739d-b3c2-4058-8edf-354c57fba650",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eYP32VFmnqhaHcAn",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.output }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "notify  owner",
+              "description": "=This process is responsible for handling messages related to customer order confirmations.\nIt will analyze the received text and determine whether it is intended for sending an order confirmation to the customer.\n\nIf the message clearly indicates that it involves confirming an order to the customer, forward it for processing.\n\nIf the message does not match this requirement or is unrelated to customer confirmation, ignore it and do not pass it through for classification."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        352
+      ],
+      "id": "e04f949b-494c-4ff2-ba1a-6ca009c76401",
+      "name": "Text Classifier1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        560
+      ],
+      "id": "7b969255-fd16-45b3-9062-2016893ec0b3",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "MJhgZR8puysekiKj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.wassenger.com/v1/messages?token= 524d9bcef788ea2874d608e924887577f6385c2b78504571cc26c8de38f4c4c339be5bddc6fa4566",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone\": \"+923116574859\",\n  \"message\": \"{{ $json.output ? $json.output.replace(/[\\n\\r]/g, ' ').replace(/\"/g, '\\\\\\\"') : '' }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        -48
+      ],
+      "id": "9c7eb1f4-964c-4ec4-a9c1-468698b5a8a2",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.output }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "notify  owner",
+              "description": "=This process is responsible for handling messages related to customer order confirmations.\nIt will analyze the received text and determine whether it is intended for sending an order confirmation to the customer.\n\nIf the message clearly indicates that it involves confirming an order to the customer, forward it for processing.\n\nIf the message does not match this requirement or is unrelated to customer confirmation, ignore it and do not pass it through for classification."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        -48
+      ],
+      "id": "b770bd6f-10e0-4f6c-995e-f06390d72969",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        112
+      ],
+      "id": "c1303402-0dcf-4788-8116-29e5396f01a1",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "MJhgZR8puysekiKj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "User information/user question recive from vapi",
+        "height": 352,
+        "width": 416,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -112
+      ],
+      "id": "ce8b977e-cceb-4214-ba21-04c999116e73",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Ai agent for summarizing order and ans menu related questions",
+        "height": 448,
+        "width": 432,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -112
+      ],
+      "id": "11b199c7-1128-4243-afc0-acc711959e6e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "RAG",
+        "height": 640,
+        "width": 1200,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        576
+      ],
+      "id": "640b8101-262f-442a-bd31-f99d890d0efd",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "notifying_owner",
+        "height": 368,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        320
+      ],
+      "id": "79df1b31-995f-4415-87d9-d58cc9edf397",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "sending_confirmation to customer",
+        "height": 368,
+        "width": 752,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -112
+      ],
+      "id": "8f7b5dc0-2348-456d-85c8-8d5532a7d272",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "Responding_back",
+        "height": 272,
+        "width": 400,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        -512
+      ],
+      "id": "53a628b3-c54b-489b-8065-0959b14ec1f5",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "\nAbout the creator :\n\nHi! I’m Hassan Khaleeq from Pakistan 🇵🇰.\nI’m a 14-year-old AI Agent learner and builder, passionate about creating automations in n8n and exploring new AI tools.\nI love combining creativity and technology to build smart systems and learn something new every day!\nmy channel link : https://www.youtube.com/@DigitalElectrition",
+        "height": 848,
+        "width": 992,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1376,
+        -400
+      ],
+      "id": "aab21157-f920-4a7b-aabb-dc269bd525d7",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "serried-easter-panlogistically.ngrok-free.app",
+            "user-agent": "axios/1.8.3",
+            "content-length": "14660",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "baggage": "sentry-environment=production,sentry-public_key=a0021577936aec367b16615ad816c078,sentry-trace_id=bf277cdabcd14b0a9bfc16405aa8e182",
+            "content-type": "application/json",
+            "cookie": "callId=0199d291-0eef-7118-90a1-570a3c48222d",
+            "sentry-trace": "bf277cdabcd14b0a9bfc16405aa8e182-a3308382f02779a7",
+            "x-call-id": "0199d291-0eef-7118-90a1-570a3c48222d",
+            "x-forwarded-for": "167.150.225.32",
+            "x-forwarded-host": "serried-easter-panlogistically.ngrok-free.app",
+            "x-forwarded-proto": "https",
+            "x-vapi-secret": ""
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": {
+              "timestamp": 1760174392778,
+              "type": "tool-calls",
+              "toolCalls": [
+                {
+                  "id": "call_La3doj2pEmDakU5Qdf5UIBi5",
+                  "type": "function",
+                  "function": {
+                    "name": "get_customer_data",
+                    "arguments": {
+                      "home adress": "street number 5",
+                      "contact_number": "1 2 3 4 5",
+                      "what to order": "cheeseburger",
+                      "cutomer_full_name": "Hassan",
+                      "special_instruction": ""
+                    }
+                  }
+                }
+              ],
+              "toolCallList": [
+                {
+                  "id": "call_La3doj2pEmDakU5Qdf5UIBi5",
+                  "type": "function",
+                  "function": {
+                    "name": "get_customer_data",
+                    "arguments": {
+                      "home adress": "street number 5",
+                      "contact_number": "1 2 3 4 5",
+                      "what to order": "cheeseburger",
+                      "cutomer_full_name": "Hassan",
+                      "special_instruction": ""
+                    }
+                  }
+                }
+              ],
+              "toolWithToolCallList": [
+                {
+                  "type": "function",
+                  "function": {
+                    "name": "get_customer_data",
+                    "parameters": {
+                      "type": "object",
+                      "required": [
+                        "home adress\r\n",
+                        "what to order\r\n",
+                        "contact_number",
+                        "cutomer_full_name\r\n",
+                        "special_instruction"
+                      ],
+                      "properties": {
+                        "home adress\r\n": {
+                          "type": "string",
+                          "default": "",
+                          "description": ""
+                        },
+                        "contact_number": {
+                          "type": "string",
+                          "default": "",
+                          "description": ""
+                        },
+                        "what to order\r\n": {
+                          "type": "string",
+                          "default": "",
+                          "description": ""
+                        },
+                        "cutomer_full_name\r\n": {
+                          "type": "string",
+                          "default": "",
+                          "description": ""
+                        },
+                        "special_instruction": {
+                          "type": "string",
+                          "default": "",
+                          "description": ""
+                        }
+                      }
+                    },
+                    "description": "this tool is used to get information from user to take their orders and send these information to server"
+                  },
+                  "server": {
+                    "url": "https://serried-easter-panlogistically.ngrok-free.app/webhook-test/course",
+                    "headers": {
+                      "Content-Type": "application/json"
+                    }
+                  },
+                  "messages": [
+                    {
+                      "type": "request-start",
+                      "content": "Please hold on i am processing your order",
+                      "contents": [],
+                      "conditions": [],
+                      "blocking": false
+                    },
+                    {
+                      "type": "request-complete",
+                      "content": "thanks for your patience your order is placed you will receive a conformation shortly . have a nice day bye...",
+                      "contents": [],
+                      "conditions": [],
+                      "endCallAfterSpokenEnabled": true,
+                      "role": "assistant"
+                    },
+                    {
+                      "type": "request-failed",
+                      "content": "ow! its look like i have an issue ,please try again bye !",
+                      "conditions": [],
+                      "contents": [],
+                      "endCallAfterSpokenEnabled": true
+                    }
+                  ],
+                  "toolCall": {
+                    "id": "call_La3doj2pEmDakU5Qdf5UIBi5",
+                    "type": "function",
+                    "function": {
+                      "name": "get_customer_data",
+                      "arguments": {
+                        "home adress": "street number 5",
+                        "contact_number": "1 2 3 4 5",
+                        "what to order": "cheeseburger",
+                        "cutomer_full_name": "Hassan",
+                        "special_instruction": ""
+                      }
+                    }
+                  }
+                }
+              ],
+              "artifact": {
+                "messages": [
+                  {
+                    "role": "system",
+                    "message": "You are a friendly and professional restaurant order assistant to take customers orders. Your goal is to collect all required information using the defined tool provided(get-data-for-taking-orders) send these info to server and must collect all information from the tool provided and if customer ask anything about menu ,prices,or any question regarding resturent answer him by tool provided  . Speak clearly and naturally. If the customer is confused or asks questions about the menu, try to assist them. Confirm the final order before ending the call. and also tell the user about total price of items he ordered \nnote : if  the you are unsure what  is the name of user  ask him to tell exact spelling of there name \ncommunication style :\nTone: Friendly, warm, and respectful\n\nStyle: Natural, conversational, and human-like\n\nEnergy: Calm and professional, not robotic\n\nPacing: Speak slowly and clearly, especially for non-English speakers\n\nPersonality: Polite, helpful, and patient\n\nAvoid: Technica...",
+                    "time": 1760174346166,
+                    "secondsFromStart": 0
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Hi. Thanks for calling. Welcome to Hassan Restaurant. I'll help you place your order today. Please tell me your full name to begin.",
+                    "time": 1760174348369,
+                    "endTime": 1760174355939,
+                    "secondsFromStart": -4.328,
+                    "duration": 5500,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "My full name is Hassan, and my contact number is 1 2 3 4 5, and my home address is street number 5. And what I want to order a cheeseburger.",
+                    "time": 1760174356869,
+                    "endTime": 1760174365189,
+                    "secondsFromStart": 4.172,
+                    "duration": 7760,
+                    "metadata": {
+                      "wordLevelConfidence": [
+                        {
+                          "word": "my",
+                          "start": 10.5,
+                          "end": 10.740001,
+                          "confidence": 0.59033203,
+                          "punctuated_word": "My"
+                        },
+                        {
+                          "word": "full",
+                          "start": 10.740001,
+                          "end": 10.9800005,
+                          "confidence": 1,
+                          "punctuated_word": "full"
+                        },
+                        {
+                          "word": "name",
+                          "start": 10.9800005,
+                          "end": 11.22,
+                          "confidence": 1,
+                          "punctuated_word": "name"
+                        },
+                        {
+                          "word": "is",
+                          "start": 11.22,
+                          "end": 11.38,
+                          "confidence": 1,
+                          "punctuated_word": "is"
+                        },
+                        {
+                          "word": "hassan",
+                          "start": 11.38,
+                          "end": 11.700001,
+                          "confidence": 0.88061523,
+                          "punctuated_word": "Hassan,"
+                        },
+                        {
+                          "word": "and",
+                          "start": 11.700001,
+                          "end": 11.860001,
+                          "confidence": 1,
+                          "punctuated_word": "and"
+                        },
+                        {
+                          "word": "my",
+                          "start": 11.860001,
+                          "end": 12.1,
+                          "confidence": 1,
+                          "punctuated_word": "my"
+                        },
+                        {
+                          "word": "contact",
+                          "start": 12.1,
+                          "end": 12.44,
+                          "confidence": 0.99902344,
+                          "punctuated_word": "contact"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Thank you, Hassan. Just to confirm, full name Hassan. Contact",
+                    "time": 1760174367978.999,
+                    "endTime": 1760174372158.999,
+                    "secondsFromStart": 15.2819990234375,
+                    "duration": 3720,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "Yes. Yes. You are correct. Please place the order.",
+                    "time": 1760174371779,
+                    "endTime": 1760174374069,
+                    "secondsFromStart": 19.082,
+                    "duration": 2290,
+                    "metadata": {
+                      "wordLevelConfidence": [
+                        {
+                          "word": "yes",
+                          "start": 25.41,
+                          "end": 25.73,
+                          "confidence": 0.91186523,
+                          "punctuated_word": "Yes."
+                        },
+                        {
+                          "word": "yes",
+                          "start": 25.73,
+                          "end": 25.89,
+                          "confidence": 1,
+                          "punctuated_word": "Yes."
+                        },
+                        {
+                          "word": "you",
+                          "start": 25.89,
+                          "end": 26.05,
+                          "confidence": 0.9970703,
+                          "punctuated_word": "You"
+                        },
+                        {
+                          "word": "are",
+                          "start": 26.05,
+                          "end": 26.210001,
+                          "confidence": 0.63671875,
+                          "punctuated_word": "are"
+                        },
+                        {
+                          "word": "correct",
+                          "start": 26.210001,
+                          "end": 26.53,
+                          "confidence": 1,
+                          "punctuated_word": "correct."
+                        },
+                        {
+                          "word": "please",
+                          "start": 26.53,
+                          "end": 26.85,
+                          "confidence": 1,
+                          "punctuated_word": "Please"
+                        },
+                        {
+                          "word": "place",
+                          "start": 26.85,
+                          "end": 27.09,
+                          "confidence": 0.9980469,
+                          "punctuated_word": "place"
+                        },
+                        {
+                          "word": "the",
+                          "start": 27.09,
+                          "end": 27.25,
+                          "confidence": 0.65966797,
+                          "punctuated_word": "the"
+                        },
+                        {
+                          "word": "order",
+                          "start": 27.25,
+                          "end": 27.7,
+                          "confidence": 0.9880371,
+                          "punctuated_word": "order."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Great. I just need to confirm your order. You're ordering 1 cheeseburger. Your contact number is 1 2 3 4 5.",
+                    "time": 1760174376179,
+                    "endTime": 1760174383379.002,
+                    "secondsFromStart": 23.482,
+                    "duration": 6639.9990234375,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "Yes. Yes. You are correct. Please place my order.",
+                    "time": 1760174383178.998,
+                    "endTime": 1760174386749,
+                    "secondsFromStart": 30.481998046875,
+                    "duration": 2920.001953125,
+                    "metadata": {
+                      "wordLevelConfidence": [
+                        {
+                          "word": "yes",
+                          "start": 36.809998,
+                          "end": 37.21,
+                          "confidence": 0.94628906,
+                          "punctuated_word": "Yes."
+                        },
+                        {
+                          "word": "yes",
+                          "start": 37.21,
+                          "end": 37.71,
+                          "confidence": 0.9951172,
+                          "punctuated_word": "Yes."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "toolCalls": [
+                      {
+                        "id": "call_La3doj2pEmDakU5Qdf5UIBi5",
+                        "type": "function",
+                        "function": {
+                          "name": "get_customer_data",
+                          "arguments": "{\n  \"home adress\": \"street number 5\",\n  \"contact_number\": \"1 2 3 4 5\",\n  \"what to order\": \"cheeseburger\",\n  \"cutomer_full_name\": \"Hassan\",\n  \"special_instruction\": \"\"\n}"
+                        }
+                      }
+                    ],
+                    "role": "tool_calls",
+                    "message": "",
+                    "time": 1760174392771,
+                    "secondsFromStart": 40.074
+                  }
+                ],
+                "messagesOpenAIFormatted": [
+                  {
+                    "role": "system",
+                    "content": "You are a friendly and professional restaurant order assistant to take customers orders. Your goal is to collect all required information using the defined tool provided(get-data-for-taking-orders) send these info to server and must collect all information from the tool provided and if customer ask anything about menu ,prices,or any question regarding resturent answer him by tool provided  . Speak clearly and naturally. If the customer is confused or asks questions about the menu, try to assist them. Confirm the final order before ending the call. and also tell the user about total price of items he ordered \nnote : if  the you are unsure what  is the name of user  ask him to tell exact spelling of there name \ncommunication style :\nTone: Friendly, warm, and respectful\n\nStyle: Natural, conversational, and human-like\n\nEnergy: Calm and professional, not robotic\n\nPacing: Speak slowly and clearly, especially for non-English speakers\n\nPersonality: Polite, helpful, and patient\n\nAvoid: Technica..."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Hi. Thanks for calling. Welcome to Hassan Restaurant. I'll help you place your order today. Please tell me your full name to begin."
+                  },
+                  {
+                    "role": "user",
+                    "content": "My full name is Hassan, and my contact number is 1 2 3 4 5, and my home address is street number 5. And what I want to order a cheeseburger."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Thank you, Hassan. Just to confirm, full name Hassan. Contact"
+                  },
+                  {
+                    "role": "user",
+                    "content": "Yes. Yes. You are correct. Please place the order."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Great. I just need to confirm your order. You're ordering 1 cheeseburger. Your contact number is 1 2 3 4 5."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Yes. Yes. You are correct. Please place my order."
+                  },
+                  {
+                    "role": "assistant",
+                    "tool_calls": [
+                      {
+                        "id": "call_La3doj2pEmDakU5Qdf5UIBi5",
+                        "type": "function",
+                        "function": {
+                          "name": "get_customer_data",
+                          "arguments": "{\n  \"home adress\": \"street number 5\",\n  \"contact_number\": \"1 2 3 4 5\",\n  \"what to order\": \"cheeseburger\",\n  \"cutomer_full_name\": \"Hassan\",\n  \"special_instruction\": \"\"\n}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "tool_call_id": "call_La3doj2pEmDakU5Qdf5UIBi5",
+                    "content": "Tool Result Still Pending But Proceed Further If Possible."
+                  }
+                ]
+              },
+              "call": {
+                "id": "0199d291-0eef-7118-90a1-570a3c48222d",
+                "orgId": "32f88172-4b42-474d-8a1d-b03cb7e47c07",
+                "createdAt": "2025-10-11T09:19:05.967Z",
+                "updatedAt": "2025-10-11T09:19:05.967Z",
+                "type": "webCall",
+                "cost": 0,
+                "monitor": {
+                  "listenUrl": "wss://phone-call-websocket.aws-us-west-2-backend-production3.vapi.ai/0199d291-0eef-7118-90a1-570a3c48222d/listen",
+                  "controlUrl": "https://phone-call-websocket.aws-us-west-2-backend-production3.vapi.ai/0199d291-0eef-7118-90a1-570a3c48222d/control"
+                },
+                "transport": {
+                  "provider": "daily",
+                  "videoRecordingEnabled": false,
+                  "assistantVideoEnabled": false,
+                  "callUrl": "https://vapi.daily.co/5RPyF81SPFEbWROXs8SP"
+                },
+                "webCallUrl": "https://vapi.daily.co/5RPyF81SPFEbWROXs8SP",
+                "status": "queued",
+                "assistantId": "d257d0c6-8b53-4a6d-9238-9a85c874af27",
+                "assistantOverrides": {
+                  "clientMessages": [
+                    "transcript",
+                    "hang",
+                    "metadata",
+                    "tool-calls",
+                    "tool-calls-result",
+                    "tool.completed",
+                    "transfer-update",
+                    "user-interrupted",
+                    "status-update"
+                  ]
+                }
+              },
+              "assistant": {
+                "id": "d257d0c6-8b53-4a6d-9238-9a85c874af27",
+                "orgId": "32f88172-4b42-474d-8a1d-b03cb7e47c07",
+                "name": "2nd_project_course",
+                "voice": {
+                  "model": "tts-1",
+                  "voiceId": "alloy",
+                  "provider": "openai"
+                },
+                "createdAt": "2025-10-07T16:14:02.035Z",
+                "updatedAt": "2025-10-07T16:37:07.648Z",
+                "model": {
+                  "model": "gpt-4o-mini",
+                  "toolIds": [
+                    "b2d4e24f-3ce9-4181-9a7b-b9e7a95e2e85",
+                    "1aa6eadc-97ef-490c-90af-ca550975590b"
+                  ],
+                  "messages": [
+                    {
+                      "role": "system",
+                      "content": "You are a friendly and professional restaurant order assistant to take customers orders. Your goal is to collect all required information using the defined tool provided(get-data-for-taking-orders) send these info to server and must collect all information from the tool provided and if customer ask anything about menu ,prices,or any question regarding resturent answer him by tool provided  . Speak clearly and naturally. If the customer is confused or asks questions about the menu, try to assist them. Confirm the final order before ending the call. and also tell the user about total price of items he ordered \nnote : if  the you are unsure what  is the name of user  ask him to tell exact spelling of there name \ncommunication style :\nTone: Friendly, warm, and respectful\n\nStyle: Natural, conversational, and human-like\n\nEnergy: Calm and professional, not robotic\n\nPacing: Speak slowly and clearly, especially for non-English speakers\n\nPersonality: Polite, helpful, and patient\n\nAvoid: Technical language, robotic phrasing, or sounding scripted\n\nUse simple words and short sentences\n\nSound like a real staff member from the restaurant\n\nAlways confirm what the customer says politely\n"
+                    }
+                  ],
+                  "provider": "openai",
+                  "tools": [
+                    {
+                      "id": "b2d4e24f-3ce9-4181-9a7b-b9e7a95e2e85",
+                      "createdAt": "2025-10-07T16:29:20.306Z",
+                      "updatedAt": "2025-10-07T16:36:29.453Z",
+                      "type": "function",
+                      "function": {
+                        "name": "read_menu_course",
+                        "parameters": {
+                          "type": "object",
+                          "required": [
+                            "user_question"
+                          ],
+                          "properties": {
+                            "user_question": {
+                              "type": "string",
+                              "default": "",
+                              "description": ""
+                            }
+                          }
+                        },
+                        "description": "This tool fetches detailed information from the restaurant's menu using Retrieval-Augmented Generation (RAG). The menu data is stored and processed in N8N. Use this tool when the user asks questions about food items, prices, ingredients, or availability.some questions regarding resturents if you cant find any relevent information tell the customer politly that sorry i cant find any option regarding that"
+                      },
+                      "messages": [
+                        {
+                          "type": "request-start",
+                          "blocking": false
+                        }
+                      ],
+                      "orgId": "32f88172-4b42-474d-8a1d-b03cb7e47c07",
+                      "server": {
+                        "url": "https://serried-easter-panlogistically.ngrok-free.app/webhook-test/course",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        }
+                      }
+                    },
+                    {
+                      "id": "1aa6eadc-97ef-490c-90af-ca550975590b",
+                      "createdAt": "2025-10-07T16:25:47.047Z",
+                      "updatedAt": "2025-10-07T16:29:12.288Z",
+                      "type": "function",
+                      "function": {
+                        "name": "get_customer_data",
+                        "parameters": {
+                          "type": "object",
+                          "required": [
+                            "home adress\r\n",
+                            "what to order\r\n",
+                            "contact_number",
+                            "cutomer_full_name\r\n",
+                            "special_instruction"
+                          ],
+                          "properties": {
+                            "home adress\r\n": {
+                              "type": "string",
+                              "default": "",
+                              "description": ""
+                            },
+                            "contact_number": {
+                              "type": "string",
+                              "default": "",
+                              "description": ""
+                            },
+                            "what to order\r\n": {
+                              "type": "string",
+                              "default": "",
+                              "description": ""
+                            },
+                            "cutomer_full_name\r\n": {
+                              "type": "string",
+                              "default": "",
+                              "description": ""
+                            },
+                            "special_instruction": {
+                              "type": "string",
+                              "default": "",
+                              "description": ""
+                            }
+                          }
+                        },
+                        "description": "this tool is used to get information from user to take their orders and send these information to server"
+                      },
+                      "messages": [
+                        {
+                          "type": "request-start",
+                          "content": "Please hold on i am processing your order",
+                          "blocking": false
+                        },
+                        {
+                          "role": "assistant",
+                          "type": "request-complete",
+                          "content": "thanks for your patience your order is placed you will receive a conformation shortly . have a nice day bye...",
+                          "endCallAfterSpokenEnabled": true
+                        },
+                        {
+                          "type": "request-failed",
+                          "content": "ow! its look like i have an issue ,please try again bye !",
+                          "endCallAfterSpokenEnabled": true
+                        }
+                      ],
+                      "orgId": "32f88172-4b42-474d-8a1d-b03cb7e47c07",
+                      "server": {
+                        "url": "https://serried-easter-panlogistically.ngrok-free.app/webhook-test/course",
+                        "headers": {
+                          "Content-Type": "application/json"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "firstMessage": "Hi! Thanks for calling,welcome to Hassan  restaurant. I’ll help you place your order today. please tell me your full name to begin",
+                "voicemailMessage": "Please call back when you're available.",
+                "endCallMessage": "Goodbye.",
+                "transcriber": {
+                  "model": "nova-2",
+                  "language": "en",
+                  "provider": "deepgram"
+                },
+                "clientMessages": [
+                  "transcript",
+                  "hang",
+                  "metadata",
+                  "tool-calls",
+                  "tool-calls-result",
+                  "tool.completed",
+                  "transfer-update",
+                  "user-interrupted",
+                  "status-update"
+                ]
+              }
+            }
+          },
+          "webhookUrl": "https://serried-easter-panlogistically.ngrok-free.app/webhook-test/course",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Text Classifier1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e4dbf51-d184-4abf-936b-2dd149bbee73",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e60adaa96a13d29d8baf5e8ecf7f85bb27456770d7a2a4fcc1df702728c3a50c"
+  },
+  "id": "mfEQRHfO0jtGedBs",
+  "tags": []
+}

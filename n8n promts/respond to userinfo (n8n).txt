@@ -1,0 +1,8 @@
+{
+  "results": [
+    {
+      "toolCallId": "{{ $('user information').item.json.body.message.toolCalls[0].id || '' }}",
+      "result": "{{ $json.output.replace(/"/g, '\\"').replace(/\n/g, ' ') || '' }}"
+    }
+  ]
+}

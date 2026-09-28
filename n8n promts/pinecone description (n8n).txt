@@ -1,0 +1,1 @@
+Retrieves the most relevant document chunks from Pinecone based on user queries. Ideal for Retrieval-Augmented Generation (RAG) workflows, where AI must respond using real uploaded data such as restaurant menus, FAQs, or documents. This ensures accurate and grounded responses based on your own knowledge base.

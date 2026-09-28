@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Summary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #ff6b35;
+      color: white;
+      text-align: center;
+      padding: 16px 10px;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .content {
+      padding: 20px;
+      color: #333;
+    }
+    .content p {
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+    .label {
+      font-weight: 600;
+      color: #444;
+    }
+    .footer {
+      text-align: center;
+      padding: 12px;
+      background-color: #f3f3f3;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    @media (max-width: 600px) {
+      .container { margin: 15px; }
+      .header { font-size: 1.1rem; }
+      .content { padding: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">New Order Received</div>
+    <div class="content">
+      <p>Hi <strong>{{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.cutomer_full_name }}</strong>,</p>
+      <p>has placed an order at your restaurant. Here’s the customer summary:</p>
+
+      <p><span class="label">Customer Name:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.cutomer_full_name }}</p>
+      <p><span class="label">Contact Number:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.contact_number }}</p>
+      <p><span class="label">Item(s) Placed:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments['what to order'] }}</p>
+      <p><span class="label">Special Instruction:</span> {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.special_instruction }}</p>
+    </div>
+    <div class="footer">
+      Thank you for choosing our restaurant 🍽️
+    </div>
+  </div>
+</body>
+</html>
