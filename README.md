@@ -329,12 +329,12 @@ flowchart LR
 > **Call → Understand → Answer → Confirm → Notify. Fully automated.**
 
 ---
-
 ## 👤 Author
 
-**Hassan Khaleeq**: 14-year-old AI agent learner and builder from Pakistan, passionate about creating automations in n8n and exploring new AI tools.
+**Saqib Shehzad**: Full Stack Developer & AI Automation Specialist from Pakistan, focused on building scalable systems and smart automations using modern technologies and AI tools.
 
-- 🎥 YouTube: *add your channel link here*
-- 💼 GitHub: *add your profile link here*
+* 💼 GitHub: https://github.com/saqibshehzadofficial21
+* 🔗 LinkedIn: https://www.linkedin.com/in/saqibshehzadofficial01/
+* 📦 Project Repo: https://github.com/saqibshehzadofficial21/Restaurant-Automation-Order-Taking-Project.git
 
 ⭐ If you found this useful, consider starring the repo!
